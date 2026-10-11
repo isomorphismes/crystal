@@ -14,6 +14,7 @@
 #include "diagnostic_state.h"
 #include "crystal_model.h"
 #include "crystal_render.h"
+#include "crystal_surface_shader.h"
 #if defined(__ANDROID__)
 #include <unistd.h>
 #include <GLES2/gl2.h>
@@ -185,6 +186,23 @@ int main(void) {
     TraceLog(LOG_INFO, "Crystal: kind=%d nodes=%d facets=%d edges=%d",
              CRYSTAL_KIND, net.net.node_count, net.net.facet_count, edge_count);
 
+    /* Reuse Mostow's directional normal shading, but retain Crystal's
+       separate flat normals and raylib's model-normal matrix on rotation. */
+    Shader facet_shader=LoadShaderFromMemory(crystal_facet_vertex_shader,crystal_facet_fragment_shader);
+    int color_uniform=-1;
+    bool valid_shader=IsShaderValid(facet_shader);
+    if (valid_shader) color_uniform=GetShaderLocation(facet_shader,"u_material_color");
+    if (!valid_shader || color_uniform<0 ||
+        facet_shader.locs[SHADER_LOC_MATRIX_MVP]<0 ||
+        facet_shader.locs[SHADER_LOC_MATRIX_NORMAL]<0 ||
+        GetShaderLocationAttrib(facet_shader,"vertexNormal")<0) {
+        TraceLog(LOG_ERROR,"Crystal facet lighting shader unavailable");
+        UnloadShader(facet_shader); UnloadModel(model); CloseWindow(); return 2;
+    }
+    model.materials[0].shader=facet_shader;
+    const float material_color[3]={tint.r/255.0f,tint.g/255.0f,tint.b/255.0f};
+    SetShaderValue(facet_shader,color_uniform,material_color,SHADER_UNIFORM_VEC3);
+
     Camera3D camera = {0};
     camera.position = (Vector3){ 4.3f, 3.2f, 5.4f };
     camera.target = (Vector3){ 0.0f, -0.15f, 0.0f };
@@ -293,7 +311,8 @@ int main(void) {
         if (showGrid) DrawGrid(12, 0.5f);
         if (renderMode != 1) {
             rlDisableBackfaceCulling();
-            DrawModel(model, Vector3Zero(), 1.0f, tint);
+            /* The shader owns pigment and normal lighting; avoid double tinting. */
+            DrawModel(model, Vector3Zero(), 1.0f, WHITE);
             rlEnableBackfaceCulling();
         }
         if (renderMode != 0) {
@@ -380,6 +399,7 @@ int main(void) {
     }
 
     UnloadModel(model);
+    UnloadShader(facet_shader);
     CloseWindow();
     return 0;
 }
