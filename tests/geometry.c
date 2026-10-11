@@ -43,6 +43,7 @@ int main(void) {
     assert(!validate_surface(&bad) && collect_net_edges(&bad,edges)==-1);
     assert(strstr(crystal_facet_vertex_shader,"matNormal")!=NULL);
     assert(strstr(crystal_facet_fragment_shader,"gl_FrontFacing")!=NULL);
+    assert(strstr(crystal_facet_fragment_shader,"u_material_color.a")!=NULL);
     /* Valid geometry plus a bad transform remains valid CPU geometry. A wrong
      * image alone cannot distinguish this from the invalid-index mutant. */
     Matrix wrong=MatrixTranslate(10000.0f,0,0);

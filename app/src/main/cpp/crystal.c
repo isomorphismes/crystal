@@ -200,8 +200,8 @@ int main(void) {
         UnloadShader(facet_shader); UnloadModel(model); CloseWindow(); return 2;
     }
     model.materials[0].shader=facet_shader;
-    const float material_color[3]={tint.r/255.0f,tint.g/255.0f,tint.b/255.0f};
-    SetShaderValue(facet_shader,color_uniform,material_color,SHADER_UNIFORM_VEC3);
+    const float material_color[4]={tint.r/255.0f,tint.g/255.0f,tint.b/255.0f,tint.a/255.0f};
+    SetShaderValue(facet_shader,color_uniform,material_color,SHADER_UNIFORM_VEC4);
 
     Camera3D camera = {0};
     camera.position = (Vector3){ 4.3f, 3.2f, 5.4f };

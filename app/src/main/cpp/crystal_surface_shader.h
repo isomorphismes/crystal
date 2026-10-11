@@ -36,7 +36,7 @@ static const char crystal_facet_vertex_shader[] =
 static const char crystal_facet_fragment_shader[] =
     CRYSTAL_F_VERSION
     CRYSTAL_F_IN " vec3 v_world_normal;\n"
-    "uniform vec3 u_material_color;\n"
+    "uniform vec4 u_material_color;\n"
     CRYSTAL_F_DECL
     "void main(){\n"
     "  vec3 n=normalize(v_world_normal);\n"
@@ -45,7 +45,7 @@ static const char crystal_facet_fragment_shader[] =
     "  vec3 fill=normalize(vec3(0.6,0.25,-0.7));\n"
     "  float diffuse=max(0.0,dot(n,key));\n"
     "  float side=max(0.0,dot(n,fill));\n"
-    "  vec3 color=u_material_color*(0.33+0.52*diffuse+0.18*side);\n"
-    "  " CRYSTAL_F_RESULT "=vec4(color,1.0);\n"
+    "  vec3 color=u_material_color.rgb*(0.33+0.52*diffuse+0.18*side);\n"
+    "  " CRYSTAL_F_RESULT "=vec4(color,u_material_color.a);\n"
     "}\n";
 #endif

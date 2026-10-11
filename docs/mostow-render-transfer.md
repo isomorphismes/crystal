@@ -8,8 +8,8 @@ Crystal keeps its C/Lua/raylib application and its **flat per-triangle normals**
 generated in `crystal_render.c`. Unlike Flower and Mostow, averaging normals
 between facets would erase the actual geometric facet boundaries. The new shader
 uses the raylib `matNormal` normal matrix, so its lighting remains correct when
-the existing model rotates; the Lua-configured color is supplied exactly once
-as a shader uniform. The earlier separate edge-overlay, x-ray, zoom, freeze,
+the existing model rotates; the Lua-configured RGBA color is supplied exactly once
+as a shader uniform, including its alpha channel. The earlier separate edge-overlay, x-ray, zoom, freeze,
 and camera diagnostics remain intact.
 
 The CPU validation now rejects repeated facet corners, degenerate triangles,
