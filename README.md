@@ -14,3 +14,7 @@ Initial materials:
 - pyrite — cubic/diploidal, with cube/pyritohedron/octahedron face families.
 
 The crystallographic labels are anchors for symmetry. Numerical gameplay weights are deliberately marked as uncalibrated until they are backed by measurement or a growth model.
+
+## External geometry examples
+
+See the [source catalogue and project examples](docs/external-geometry-examples.md), including physical constructions, intrinsic geometry engines, discrete geometry and mathematical illustration references.
