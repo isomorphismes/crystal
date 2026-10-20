@@ -1,4 +1,8 @@
 build_id	target	toolchain	ick_revision	ick_status	ick_evidence
+crystal-growth-host-tests	linux-x86_64	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:retained ICK application qualification does not cover the new growth/checkpoint/render adapter; pinned NDK host checks are separate evidence	docs/growth-engine.md
+crystal-c67-application-syntax	arm64-v8a	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:no current ICK qualification for this ARM64 NativeActivity application; syntax checks do not qualify ICK or APK production	docs/growth-engine.md
+crystal-c67-native-compile	arm64-v8a	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:no current ICK ARM64 application qualification; candidate native recipe remains protected by existing producer admission	docs/growth-engine.md
+crystal-c67-native-link	arm64-v8a	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:no current ICK ARM64 application/platform-link qualification; candidate recipe has not produced an accepted APK	docs/growth-engine.md
 crystal-armv7-raylib-compile	armeabi-v7a	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:C/raylib/Lua ARMv7 Android compilation and platform linking are not qualified through ICK	issue:functorial-games/crystal#8
 crystal-armv7-lua-compile	armeabi-v7a	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:C/raylib/Lua ARMv7 Android compilation and platform linking are not qualified through ICK	issue:functorial-games/crystal#8
 crystal-armv7-halite-compile	armeabi-v7a	ndk	79eccb8ff232e05bdbb9e345fc224f251636b43f	gap:C/raylib/Lua ARMv7 Android compilation and platform linking are not qualified through ICK	issue:functorial-games/crystal#8

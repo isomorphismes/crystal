@@ -17,10 +17,33 @@ test ! -e "$output"
 test $(/usr/bin/sha256sum "$archive" | /usr/bin/awk '{print $1}') = 4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
 /usr/bin/tar --no-same-owner -xzf "$archive" -C "$output"
 printf 'case\texpected\tresult\n' > "$output/results.tsv"
-for unit in diagnostic_state geometry; do
-  "$cc" --target=x86_64-linux-gnu --sysroot=/ -rtlib=libgcc -unwindlib=libgcc "--ld-path=$ld" -std=c99 -O2 -ffunction-sections -fdata-sections -Wl,--gc-sections "-I$ray/src" "-I$output/lua-5.4.8/src" "$tests/$unit.c" "$tests/../app/src/main/cpp/crystal_model.c" -lm -o "$output/$unit"
-  "$output/$unit"
+for unit in diagnostic_state geometry growth growth_render; do
+  # Growth and its float/render adapter use the same application translation units.
+  "$cc" --target=x86_64-linux-gnu --sysroot=/ -rtlib=libgcc -unwindlib=libgcc "--ld-path=$ld" -std=c99 -O2 -Wall -Wextra -Werror -ffunction-sections -fdata-sections -Wl,--gc-sections "-I$ray/src" "$tests/$unit.c" "$tests/../app/src/main/cpp/crystal_growth.c" "$tests/../app/src/main/cpp/crystal_growth_surface.c" "$tests/../app/src/main/cpp/crystal_model.c" "$tests/../app/src/main/cpp/crystal_render.c" -lm -o "$output/$unit"
+  "$output/$unit" > "$output/$unit.tsv"
+  /usr/bin/cat "$output/$unit.tsv"
   printf '%s\tindependent assertions\tPASS\n' "$unit" >> "$output/results.tsv"
 done
+"$output/growth" 10000 > "$output/growth-long.tsv"
+"$cc" --target=x86_64-linux-gnu --sysroot=/ -fsyntax-only -std=c99 "-I$ray/src" "-I$output/lua-5.4.8/src" "$tests/../app/src/main/cpp/crystal.c" "$tests/../app/src/main/cpp/crystal_render.c" "$tests/../app/src/main/cpp/crystal_model.c" "$tests/../app/src/main/cpp/crystal_growth.c" "$tests/../app/src/main/cpp/crystal_growth_surface.c"
+printf 'growth-long\t10000 steps per material\tPASS\napplication-syntax\tpinned headers\tPASS\n' >> "$output/results.tsv"
+for kind in 0 1 2 3; do
+  "$cc" --target=aarch64-linux-android21 -fsyntax-only -std=c99 -DPLATFORM_ANDROID "-DCRYSTAL_KIND=$kind" "-I$ray/src" "-I$output/lua-5.4.8/src" "-I$ndk/sources/android/native_app_glue" "$tests/../app/src/main/cpp/crystal.c" "$tests/../app/src/main/cpp/crystal_render.c" "$tests/../app/src/main/cpp/crystal_model.c" "$tests/../app/src/main/cpp/crystal_growth.c" "$tests/../app/src/main/cpp/crystal_growth_surface.c"
+done
+printf 'c67-application-syntax\tfour ARM64 material variants, not linking or execution\tPASS\n' >> "$output/results.tsv"
+ulimit -c 0
+proc reject_mutation(name, replacement, diagnostic) {
+  /usr/bin/sed "$replacement" "$tests/../app/src/main/cpp/crystal_growth.c" > "$output/$name.c"
+  "$cc" --target=x86_64-linux-gnu --sysroot=/ -rtlib=libgcc -unwindlib=libgcc "--ld-path=$ld" -std=c99 -O2 "-I$tests/../app/src/main/cpp" "$tests/growth.c" "$output/$name.c" -lm -o "$output/$name"
+  if "$output/$name" > "$output/$name.log" 2>&1; then
+    echo "mutation unexpectedly passed: $name" >&2; exit 1
+  fi
+  /usr/bin/grep -Fq "$diagnostic" "$output/$name.log"
+  printf '%s\tintended assertion rejects mutant\tPASS\n' "$name" >> "$output/results.tsv"
+}
+reject_mutation constant-speeds 's/state->law.speed\[family\]/1.0/' 'fabs(axis-1.08)'
+reject_mutation erased-handedness 's/state->law.handedness\*\.12/.12/' 'fabs(right-left)'
+reject_mutation erased-diploidal 's/=2\*first;/=first;/' 'diploidal_difference>10'
 /usr/bin/sha256sum "$cc" "$ld" "$tests/diagnostic_state.c" "$tests/geometry.c" "$tests/../app/src/main/cpp/crystal.c" > "$output/materials.sha256"
+/usr/bin/sha256sum "$tests/growth.c" "$tests/growth_render.c" "$tests/../app/src/main/cpp/crystal_growth.c" "$tests/../app/src/main/cpp/crystal_growth.h" "$tests/../app/src/main/cpp/crystal_growth_surface.c" "$tests/../app/src/main/cpp/crystal_render.c" >> "$output/materials.sha256"
 /usr/bin/cat "$output/results.tsv"

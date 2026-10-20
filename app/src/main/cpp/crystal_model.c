@@ -2,18 +2,59 @@
 #include "raymath.h"
 #include <math.h>
 #include <string.h>
-bool validate_surface(const CrystalSurface *net) {
-    if (net->net.node_count <= 0 || net->net.node_count > MAX_NET_NODES ||
-        net->net.facet_count <= 0 || net->net.facet_count > MAX_NET_FACETS) return false;
-    for (int n=0; n<net->net.node_count; n++) {
-        Vector3 p=net->embedding.nodes[n].position;
+/* Validate the closed, oriented, piecewise-flat material surface before the
+ * renderer can infer flat normals. Geometry tests explicitly mutate each rule.
+ * This is a mesoscopic net, not an atomic lattice or growth simulation. */
+bool validate_surface(const CrystalSurface *surface) {
+    if (!surface || surface->net.node_count<=0 || surface->net.node_count>MAX_NET_NODES ||
+        surface->net.facet_count<=0 || surface->net.facet_count>MAX_NET_FACETS) return false;
+    for (int n=0;n<surface->net.node_count;n++) {
+        Vector3 p=surface->embedding.nodes[n].position;
         if (!isfinite(p.x) || !isfinite(p.y) || !isfinite(p.z)) return false;
     }
-    for (int f=0; f<net->net.facet_count; f++) {
-        if (net->net.facets[f].count < 3 || net->net.facets[f].count > MAX_FACET_NODES) return false;
-        for (int v=0; v<net->net.facets[f].count; v++) {
-            int id=net->net.facets[f].node[v];
-            if (id < 0 || id >= net->net.node_count) return false;
+    /* Validate every neighbor's metadata before the incidence walk can read it. */
+    for(int f=0;f<surface->net.facet_count;f++) {
+        const CrystalFacet *facet=&surface->net.facets[f];
+        if(facet->count<3 || facet->count>MAX_FACET_NODES) return false;
+        for(int c=0;c<facet->count;c++) if(facet->node[c]<0 || facet->node[c]>=surface->net.node_count) return false;
+    }
+    for (int f=0;f<surface->net.facet_count;f++) {
+        const CrystalFacet *facet=&surface->net.facets[f];
+        if (facet->count<3 || facet->count>MAX_FACET_NODES) return false;
+        for (int v=0;v<facet->count;v++) {
+            int id=facet->node[v];
+            if (id<0 || id>=surface->net.node_count) return false;
+            for (int w=v+1;w<facet->count;w++) if (id==facet->node[w]) return false;
+        }
+        Vector3 p0=surface->embedding.nodes[facet->node[0]].position;
+        Vector3 p1=surface->embedding.nodes[facet->node[1]].position;
+        Vector3 p2=surface->embedding.nodes[facet->node[2]].position;
+        Vector3 normal=Vector3CrossProduct(Vector3Subtract(p1,p0),Vector3Subtract(p2,p0));
+        float squared=Vector3DotProduct(normal,normal);
+        if (!(squared>1e-10f) || !isfinite(squared)) return false;
+        if (facet->count==4) {
+            Vector3 p3=surface->embedding.nodes[facet->node[3]].position;
+            Vector3 other=Vector3CrossProduct(Vector3Subtract(p2,p0),Vector3Subtract(p3,p0));
+            if (!(Vector3DotProduct(normal,other)>0.0f)) return false;
+            float offset=fabsf(Vector3DotProduct(normal,Vector3Subtract(p3,p0)))/sqrtf(squared);
+            float scale=1.0f+fmaxf(Vector3Distance(p1,p0),
+                                   fmaxf(Vector3Distance(p2,p0),Vector3Distance(p3,p0)));
+            if (!(offset<=1e-5f*scale)) return false;
+        }
+        /* Every directed boundary edge must have exactly one reverse on the
+         * adjacent facet. A flipped face or open seam cannot be silently lit. */
+        for (int v=0;v<facet->count;v++) {
+            int a=facet->node[v],b=facet->node[(v+1)%facet->count];
+            int forwards=0,backwards=0;
+            for (int g=0;g<surface->net.facet_count;g++) {
+                const CrystalFacet *neighbor=&surface->net.facets[g];
+                for (int k=0;k<neighbor->count;k++) {
+                    int x=neighbor->node[k],y=neighbor->node[(k+1)%neighbor->count];
+                    if (x==a && y==b) forwards++;
+                    if (x==b && y==a) backwards++;
+                }
+            }
+            if (forwards!=1 || backwards!=1) return false;
         }
     }
     return true;

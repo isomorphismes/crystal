@@ -1,5 +1,10 @@
 # Functorial C repair / qualification — 2026-10-06
 
+Current source update, 2026-10-20: the application now consumes an executable
+shared growth candidate. See [the model and precise qualification boundaries](growth-engine.md).
+The static-viewer findings below describe the retained 2026-10-06 ancestor;
+independent producer, signing and physical acceptance remain unresolved.
+
 **STRUCTURAL REPAIR REQUIRED:** this active branch is a static material-template
 viewer. It does not implement the constitutive growth model in `net-model.md`.
 ICK application compilation is separately blocked on Bionic nullability and

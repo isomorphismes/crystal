@@ -10,6 +10,17 @@ var script = $(/usr/bin/readlink -f "$0")
 var scripts = $(/usr/bin/dirname "$script")
 var github = $(/usr/bin/dirname "$scripts")
 var root = $(/usr/bin/dirname "$github")
+var abi = $(/usr/bin/awk -F '\t' '$1=="abi" {print $2}' "$build/materials.tsv")
+var target_name = ''
+case "$abi" in
+  arm64-v8a)
+    setvar target_name = 'c67'
+    ;;
+  armeabi-v7a)
+    setvar target_name = 'miro'
+    ;;
+  *) echo 'unsupported or ambiguous native ABI receipt' >&2; exit 1 ;;
+esac
 test ! -e "$output" || { echo 'fresh packaging attempt required' >&2; exit 1; }
 /usr/bin/mkdir -p "$output"
 setvar output = $(/usr/bin/readlink -f "$output")
@@ -21,12 +32,14 @@ setglobal ENV.ANDROID_VERSION_CODE = version
 setglobal ENV.ANDROID_VERSION_NAME = "0.3-candidate-$version"
 setglobal ENV.ANDROID_PACKAGE_ID = ''
 printf 'material\tapk_bytes\tsha256\n' > "$work/packages.tsv"
-for material in halite quartz bismuth; do
+for material in halite quartz bismuth pyrite; do
   setglobal ENV.ANDROID_PACKAGE_ID = "org.isomorphisms.crystal.$material"
   # Each material owns its actual Android display name and metadata.
   /usr/bin/sed "s/android:label=\"Crystal\"/android:label=\"Crystal $material\"/" "$root/android/quartz-manifest.xml" > "$work/$material.xml"
-  var apk = "$work/crystal-$material-miro-armeabi-v7a.apk"
-  "$GREASE" "$packager/apk/build-nativeactivity-apk.ysh" "$work/$material.xml" "$build/native/$material/libcrystal.so" armeabi-v7a "$apk"
+  var apk = "$work/crystal-$material-$target_name-$abi.apk"
+  # The canonical packager currently declares Bash at its external boundary.
+  # Grease owns this consumer; do not interpret the packager in another dialect.
+  /usr/bin/bash "$packager/apk/build-nativeactivity-apk.sh" "$work/$material.xml" "$build/native/$material/libcrystal.so" "$abi" "$apk"
   var bytes = $(/usr/bin/stat -c %s "$apk")
   var digest = $(/usr/bin/sha256sum "$apk" | /usr/bin/awk '{print $1}')
   printf '%s\t%s\t%s\n' "$material" "$bytes" "$digest" >> "$work/packages.tsv"
