@@ -1,0 +1,12 @@
+field	value
+consumer_commit	fffa3c9ae49b954a447608642f9597dc428427ab
+consumer_path	android/deliver-apk.ysh
+consumer_promotion	CLOSED_UNMERGED_RETAINED
+source_commit	e745edd98f5b8c854fbba4c72bb0a0a699aa50b5
+target	c67
+input_receipt_kind	aici-android-producer-v1:local package check; not an authenticated decision
+input_apk_sha256	3f85bf44731f346eba665a97c170515843b4edbb4527c00c58e57a06ee8e8f6f
+exit_code	1
+stderr	BLOCKED: authenticated APK producer runtime is unavailable
+output	NOT_CREATED
+delivery_acceptance	NOT_VERIFIED

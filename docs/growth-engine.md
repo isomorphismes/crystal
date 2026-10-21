@@ -131,20 +131,22 @@ step count, volume and pause status, and report rejected geometry as failure.
 Neither this depth-pass repair nor shader appearance has displayed-device
 acceptance.
 
-Independent AI-CI mathematical/producer acceptance is PENDING. The approved FP
+At the native-only checkpoint, independent AI-CI mathematical/producer acceptance
+was PENDING. The approved FP
 Android registry currently lists only Wegert, and its producer requires an ICK
 object/paired recipe that Crystal does not have. No dummy object, new operation
-authority or policy exception was supplied. Current AI-CI main lists the three
-existing Crystal test identities; Pyrite has no entry. Installed C67 package
+authority or policy exception was supplied. That checkpoint listed three
+existing Crystal test identities. Installed C67 package
 and certificate compatibility has not been observed. The earlier original-key
 recovery obligation remains unresolved. No APK was signed, delivered, installed
-or physically accepted, and no PR is eligible for merge on this host evidence.
+or physically accepted at that checkpoint. This host evidence did not qualify
+the application for merge.
 The exact-commit GitHub run on October 21 failed before compilation with
 `BLOCKED: registered Android operation is not deployed`:
 https://github.com/isomorphismes/crystal/actions/runs/39597755932/job/119214209536.
 The retained registered-operation work also requires qualified predecessor
 decisions; the local native pipeline grants none of that authority. The
-maintained Kitchen/producer route, approved signer provision and installed C67
+maintained Kitchen/producer route and installed C67
 update identity remain completion obligations.
 
 ## Signing preparation correction
@@ -154,21 +156,48 @@ packaging workflow. It selects the publicly committed Wegert test keystore at
 `89dcfb840cec1a66ee04c7f7404954cbd6c09839`. The declared certificate is the
 same `de9b1d47…e92ff9` test identity already registered centrally for Halite,
 Quartz and Bismuth. Calling this a missing private signer was too strong.
-The keystore's actual certificate has not been read here: retrieval/use still
-awaits explicit authorization. No new key, replacement certificate or installed
-application migration is authorized by this preparation.
+The human explicitly authorized retrieval/use for all four materials, including
+Pyrite's registration, on October 21. The retrieved 2788-byte keystore matches
+Git blob `7dc3fd0f38608bfcfe8e6942c8b2d183557b6396`; keytool observed exactly
+the centrally registered certificate. No new key or installed signer migration
+was performed.
 
 [isomorphisms/ai-ci PR #314, “Propose Crystal Pyrite's shared public test signing identity”](https://github.com/isomorphisms/ai-ci/pull/314)
-proposes the matching test-only Pyrite row. Its fourteen registry cases pass
-locally, including wrong-signer and unregistered-release cases. The proposal is
-unmerged and cannot grant itself publication authority.
+added the matching test-only Pyrite row and was merged as
+`a9866eaef44f4a2f94e05da517783f136924335d`. Its fourteen registry cases passed
+both locally and in exact-head hosted AI-CI with qualified ICK, including
+wrong-signer and unregistered-release cases. This registration does not grant
+production release, signer migration or physical acceptance.
 
 Before packaging, the consumer now checks all four linked payload hashes and
 unique receipt rows, validates Android's versionCode range, and refuses missing
-signing input before creating output. Eight rejection/preservation cases pass
+signing input before creating output. Nine rejection/preservation cases pass
 under Grease through Flexible Pipes. SDK35/API34 archive hashes were verified
-and the real aapt2 runs. No APK has been packaged or signed. Registered-producer,
-independent mathematical and physical C67 acceptance remain separate open work.
+and the real aapt2 runs. Source receipts reject an unknown native source commit.
+
+## Signed ARM64 test candidates
+
+Four standalone versionCode 17 APKs have now been packaged through Flexible
+Pipes and the canonical direct android-NDK packager. The native payloads remain
+exactly those built at `e745edd98f5b8c854fbba4c72bb0a0a699aa50b5`; the package
+recipe is from `8c0299abc16106aa6fd9ea61e96b006650d26bff`. Every packaging
+receipt records the native source revision. See `evidence/growth-c67/package-20261021`.
+
+The unchanged approved AI-CI package checker at
+`a9866eaef44f4a2f94e05da517783f136924335d` passed all four finished APKs:
+canonical package/version/NativeActivity, registered test signer, exact ARM64
+ABI, no DEX and matching packager receipt/digest. Extracted native payloads also
+match the native build receipts and all four APKs pass zipalign. AI-CI's inherited
+`cc` process interface used a narrow pinned NDK compiler/linker adapter; system
+cc was not selected. These were local checker executions, not hosted Crystal
+acceptance or proof of producer isolation.
+
+Registered isolated-producer and independent mathematical acceptance remain
+open. Cat Food's retained authenticated consumer cannot deliver while its
+approved producer runtime is unavailable. C67 installed package/certificate
+compatibility, installation, GPU rendering and interaction are unobserved.
+These APKs are signed test candidates, not accepted releases. No application
+merge or issue closure follows from package inspection.
 
 Owners remain Crystal issues 2, 8 and 9. External sources in the separate
 geometry-source PR were reviewed as references; none was imported into this

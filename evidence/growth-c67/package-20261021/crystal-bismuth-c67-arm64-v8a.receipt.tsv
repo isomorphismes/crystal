@@ -1,0 +1,13 @@
+schema	android-ndk-nativeactivity-apk-v1
+package	org.isomorphisms.crystal.bismuth
+version_code	17
+version_name	0.3-candidate-17
+launcher_label	Crystal bismuth
+launcher_activity_label	Crystal bismuth
+abi	arm64-v8a
+native_library	libcrystal.so
+native_sha256	82f5c5bf0e350594eed955032e5264aa141c98a36a0780ed560662ff084b1dc4
+manifest_sha256	04b75c2d81bb89fa4f380d2cdd506153aa81b56cf4b9f66b0293c4f1d0551db6
+apk_sha256	578c6c809282d83a217cfba43ff79f405a69d39b047e0a35f6c4ab167860a551
+signer_cert_sha256	de9b1d47c5a65e6d46a204b79dd9ee566b9d3c9832ba81ebc4213d3392e92ff9
+source_commit	e745edd98f5b8c854fbba4c72bb0a0a699aa50b5
