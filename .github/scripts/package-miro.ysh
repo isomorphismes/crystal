@@ -10,6 +10,8 @@ var script = $(/usr/bin/readlink -f "$0")
 var scripts = $(/usr/bin/dirname "$script")
 var github = $(/usr/bin/dirname "$scripts")
 var root = $(/usr/bin/dirname "$github")
+var source = $(/usr/bin/awk -F '\t' '$1=="source_commit"{count++;value=$2}END{if(count!=1)exit 1;print value}' "$build/materials.tsv")
+/usr/bin/grep -Eq '^[0-9a-f]{40}$' <<< "$source" || { echo 'invalid native source commit' >&2; exit 1; }
 /usr/bin/grep -Eq '^[1-9][0-9]{0,9}$' <<< "$version" || { echo 'invalid Android versionCode' >&2; exit 1; }
 test "$version" -le 2100000000 || { echo 'Android versionCode exceeds platform limit' >&2; exit 1; }
 var abi = $(/usr/bin/awk -F '\t' '$1=="abi" {print $2}' "$build/materials.tsv")
@@ -41,6 +43,7 @@ setglobal ENV.ANDROID_MIN_SDK = '21'
 setglobal ENV.ANDROID_TARGET_SDK = '34'
 setglobal ENV.ANDROID_VERSION_CODE = version
 setglobal ENV.ANDROID_VERSION_NAME = "0.3-candidate-$version"
+setglobal ENV.ANDROID_SOURCE_COMMIT = source
 setglobal ENV.ANDROID_PACKAGE_ID = ''
 printf 'material\tapk_bytes\tsha256\n' > "$work/packages.tsv"
 for material in halite quartz bismuth pyrite; do
@@ -61,4 +64,5 @@ var apks = glob("$work/*.apk")
 var receipts = glob("$work/*.receipt.tsv")
 /usr/bin/mv @apks @receipts "$work/packages.tsv" "$work/acceptance.tsv" "$output/"
 /usr/bin/cp "$build/sizes.tsv" "$build/stages.tsv" "$build/materials.tsv" "$output/"
+/usr/bin/cp "$build/application-sources.sha256" "$output/"
 echo 'Crystal direct package candidate: PASS; authenticated delivery is NOT_VERIFIED'

@@ -25,6 +25,9 @@ refuse zero-version "$build" 0 'invalid Android versionCode'
 refuse excessive-version "$build" 2100000001 'Android versionCode exceeds platform limit'
 var fixture = "$output/native-fixture"
 /usr/bin/cp -R "$build" "$fixture"
+/usr/bin/sed -i 's/^source_commit\t.*/source_commit\tunknown/' "$fixture/materials.tsv"
+refuse unknown-source "$fixture" 17 'invalid native source commit'
+/usr/bin/cp "$build/materials.tsv" "$fixture/materials.tsv"
 printf 'changed payload\n' >> "$fixture/native/halite/libcrystal.so"
 refuse changed-payload "$fixture" 17 'native payload differs from build receipt: halite'
 /usr/bin/cp "$build/native/halite/libcrystal.so" "$fixture/native/halite/libcrystal.so"

@@ -1,6 +1,7 @@
 #!/usr/bin/env grease
 set -eu -o pipefail
-# Consumer-side native inspection only; no producer/signing/device authority.+test "$#" = 2 || { echo 'expected NATIVE_BUILD NEW_OUTPUT' >&2; exit 2; }
+# Consumer-side native inspection only; no producer/signing/device authority.
+test "$#" = 2 || { echo 'expected NATIVE_BUILD NEW_OUTPUT' >&2; exit 2; }
 var build = "$1"
 var output = "$2"
 test ! -e "$output" || exit 1
