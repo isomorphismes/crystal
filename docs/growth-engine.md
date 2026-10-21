@@ -147,6 +147,29 @@ decisions; the local native pipeline grants none of that authority. The
 maintained Kitchen/producer route, approved signer provision and installed C67
 update identity remain completion obligations.
 
+## Signing preparation correction
+
+The stable public test-signing route is identifiable in Mostow's maintained
+packaging workflow. It selects the publicly committed Wegert test keystore at
+`89dcfb840cec1a66ee04c7f7404954cbd6c09839`. The declared certificate is the
+same `de9b1d47…e92ff9` test identity already registered centrally for Halite,
+Quartz and Bismuth. Calling this a missing private signer was too strong.
+The keystore's actual certificate has not been read here: retrieval/use still
+awaits explicit authorization. No new key, replacement certificate or installed
+application migration is authorized by this preparation.
+
+[isomorphisms/ai-ci PR #314, “Propose Crystal Pyrite's shared public test signing identity”](https://github.com/isomorphisms/ai-ci/pull/314)
+proposes the matching test-only Pyrite row. Its fourteen registry cases pass
+locally, including wrong-signer and unregistered-release cases. The proposal is
+unmerged and cannot grant itself publication authority.
+
+Before packaging, the consumer now checks all four linked payload hashes and
+unique receipt rows, validates Android's versionCode range, and refuses missing
+signing input before creating output. Eight rejection/preservation cases pass
+under Grease through Flexible Pipes. SDK35/API34 archive hashes were verified
+and the real aapt2 runs. No APK has been packaged or signed. Registered-producer,
+independent mathematical and physical C67 acceptance remain separate open work.
+
 Owners remain Crystal issues 2, 8 and 9. External sources in the separate
 geometry-source PR were reviewed as references; none was imported into this
 engine or relabeled as licensed runtime code.

@@ -10,6 +10,8 @@ var script = $(/usr/bin/readlink -f "$0")
 var scripts = $(/usr/bin/dirname "$script")
 var github = $(/usr/bin/dirname "$scripts")
 var root = $(/usr/bin/dirname "$github")
+/usr/bin/grep -Eq '^[1-9][0-9]{0,9}$' <<< "$version" || { echo 'invalid Android versionCode' >&2; exit 1; }
+test "$version" -le 2100000000 || { echo 'Android versionCode exceeds platform limit' >&2; exit 1; }
 var abi = $(/usr/bin/awk -F '\t' '$1=="abi" {print $2}' "$build/materials.tsv")
 var target_name = ''
 case "$abi" in
@@ -22,6 +24,15 @@ case "$abi" in
   *) echo 'unsupported or ambiguous native ABI receipt' >&2; exit 1 ;;
 esac
 test ! -e "$output" || { echo 'fresh packaging attempt required' >&2; exit 1; }
+# Check the complete linked group before creating output or touching signing material.
+for material in halite quartz bismuth pyrite; do
+  var library = "$build/native/$material/libcrystal.so"
+  test -s "$library" || { echo "missing native payload: $material" >&2; exit 1; }
+  var digest = $(/usr/bin/sha256sum "$library" | /usr/bin/awk '{print $1}')
+  /usr/bin/awk -F '\t' -v material="$material" -v abi="$abi" -v digest="$digest" '$1==material {count++;if($2!=abi||$5!=digest)bad=1}END{if(count!=1||bad)exit 1}' "$build/sizes.tsv" || { echo "native payload differs from build receipt: $material" >&2; exit 1; }
+done
+var keystore = get(ENV, 'ANDROID_KEYSTORE', '')
+test -n "$keystore" && test -s "$keystore" || { echo 'approved signing keystore is required; no key is generated or selected' >&2; exit 1; }
 /usr/bin/mkdir -p "$output"
 setvar output = $(/usr/bin/readlink -f "$output")
 var work = $(/usr/bin/mktemp -d "$output/.package.XXXXXXXX")

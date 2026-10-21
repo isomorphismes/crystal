@@ -1,0 +1,15 @@
+SELF_TEST_PASS case=good_pauli_test
+SELF_TEST_PASS case=good_crystal_pyrite_test
+SELF_TEST_PASS case=wrong_crystal_pyrite_signer
+SELF_TEST_PASS case=unregistered_crystal_pyrite_release
+SELF_TEST_PASS case=wrong_pauli_signer
+SELF_TEST_PASS case=unregistered_package
+SELF_TEST_PASS case=unregistered_release_lane
+SELF_TEST_PASS case=malformed_digest
+SELF_TEST_PASS case=good_holomorphic_test
+SELF_TEST_PASS case=good_green_grocer_test
+SELF_TEST_PASS case=wrong_green_grocer_signer
+SELF_TEST_PASS case=good_ib_prepaint_test
+SELF_TEST_PASS case=wrong_ib_prepaint_signer
+SELF_TEST_PASS case=unregistered_green_grocer_release
+SELF_TEST_SUMMARY cases=14 failures=0

@@ -1,0 +1,5 @@
+d1096e11aba9c974644369ee3c50d239acac3f3428ffa928e5b9c14dfb7a57de  build-tools/35.0.0/aapt2
+a205d94a45c8522ca1b571dcbe190df145c818f0a29dfb366e4dd78eef4f56a7  build-tools/35.0.0/zipalign
+b47549e373b895ce6ca620d0c7887e674d9615ffa837a86ac601dcfd04adb0f0  build-tools/35.0.0/apksigner
+00ef9948f843fe395d2440ae3ef41405b8040a6d5d46493bd1902ac0ee6deae7  build-tools/35.0.0/lib/apksigner.jar
+6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad  platforms/android-34/android.jar
