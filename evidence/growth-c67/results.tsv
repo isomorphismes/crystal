@@ -1,0 +1,11 @@
+case	expected	result
+diagnostic_state	independent assertions	PASS
+geometry	independent assertions	PASS
+growth	independent assertions	PASS
+growth_render	independent assertions	PASS
+growth-long	10000 steps per material	PASS
+application-syntax	pinned headers	PASS
+c67-application-syntax	four ARM64 material variants, not linking or execution	PASS
+constant-speeds	intended assertion rejects mutant	PASS
+erased-handedness	intended assertion rejects mutant	PASS
+erased-diploidal	intended assertion rejects mutant	PASS

@@ -1,0 +1,9 @@
+case	expected	result
+no-signer	refuse without output	PASS
+malformed-version	refuse without output	PASS
+zero-version	refuse without output	PASS
+excessive-version	refuse without output	PASS
+changed-payload	refuse without output	PASS
+duplicate-receipt	refuse without output	PASS
+missing-pyrite	refuse without output	PASS
+existing-output	preserve earlier attempt	PASS

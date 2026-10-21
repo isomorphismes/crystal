@@ -1,0 +1,68 @@
+#!/usr/bin/env grease
+set -eu -o pipefail
+test "$#" = 4 || { echo 'expected NATIVE_BUILD OUTPUT_DIRECTORY VERSION_CODE PACKAGER_ROOT' >&2; exit 2; }
+var build = "$1"
+var output = "$2"
+var version = "$3"
+var packager = "$4"
+var GREASE = ENV.GREASE_BIN
+var script = $(/usr/bin/readlink -f "$0")
+var scripts = $(/usr/bin/dirname "$script")
+var github = $(/usr/bin/dirname "$scripts")
+var root = $(/usr/bin/dirname "$github")
+var source = $(/usr/bin/awk -F '\t' '$1=="source_commit"{count++;value=$2}END{if(count!=1)exit 1;print value}' "$build/materials.tsv")
+/usr/bin/grep -Eq '^[0-9a-f]{40}$' <<< "$source" || { echo 'invalid native source commit' >&2; exit 1; }
+/usr/bin/grep -Eq '^[1-9][0-9]{0,9}$' <<< "$version" || { echo 'invalid Android versionCode' >&2; exit 1; }
+test "$version" -le 2100000000 || { echo 'Android versionCode exceeds platform limit' >&2; exit 1; }
+var abi = $(/usr/bin/awk -F '\t' '$1=="abi" {print $2}' "$build/materials.tsv")
+var target_name = ''
+case "$abi" in
+  arm64-v8a)
+    setvar target_name = 'c67'
+    ;;
+  armeabi-v7a)
+    setvar target_name = 'miro'
+    ;;
+  *) echo 'unsupported or ambiguous native ABI receipt' >&2; exit 1 ;;
+esac
+test ! -e "$output" || { echo 'fresh packaging attempt required' >&2; exit 1; }
+# Check the complete linked group before creating output or touching signing material.
+for material in halite quartz bismuth pyrite; do
+  var library = "$build/native/$material/libcrystal.so"
+  test -s "$library" || { echo "missing native payload: $material" >&2; exit 1; }
+  var digest = $(/usr/bin/sha256sum "$library" | /usr/bin/awk '{print $1}')
+  /usr/bin/awk -F '\t' -v material="$material" -v abi="$abi" -v digest="$digest" '$1==material {count++;if($2!=abi||$5!=digest)bad=1}END{if(count!=1||bad)exit 1}' "$build/sizes.tsv" || { echo "native payload differs from build receipt: $material" >&2; exit 1; }
+done
+var keystore = get(ENV, 'ANDROID_KEYSTORE', '')
+test -n "$keystore" && test -s "$keystore" || { echo 'approved signing keystore is required; no key is generated or selected' >&2; exit 1; }
+/usr/bin/mkdir -p "$output"
+setvar output = $(/usr/bin/readlink -f "$output")
+var work = $(/usr/bin/mktemp -d "$output/.package.XXXXXXXX")
+trap --add EXIT { /usr/bin/rm -r "$work" }
+setglobal ENV.ANDROID_MIN_SDK = '21'
+setglobal ENV.ANDROID_TARGET_SDK = '34'
+setglobal ENV.ANDROID_VERSION_CODE = version
+setglobal ENV.ANDROID_VERSION_NAME = "0.3-candidate-$version"
+setglobal ENV.ANDROID_SOURCE_COMMIT = source
+setglobal ENV.ANDROID_PACKAGE_ID = ''
+printf 'material\tapk_bytes\tsha256\n' > "$work/packages.tsv"
+for material in halite quartz bismuth pyrite; do
+  setglobal ENV.ANDROID_PACKAGE_ID = "org.isomorphisms.crystal.$material"
+  # Each material owns its actual Android display name and metadata.
+  /usr/bin/sed "s/android:label=\"Crystal\"/android:label=\"Crystal $material\"/" "$root/android/quartz-manifest.xml" > "$work/$material.xml"
+  var apk = "$work/crystal-$material-$target_name-$abi.apk"
+  # The canonical packager currently declares Bash at its external boundary.
+  # Grease owns this consumer; do not interpret the packager in another dialect.
+  /usr/bin/bash "$packager/apk/build-nativeactivity-apk.sh" "$work/$material.xml" "$build/native/$material/libcrystal.so" "$abi" "$apk"
+  var bytes = $(/usr/bin/stat -c %s "$apk")
+  var digest = $(/usr/bin/sha256sum "$apk" | /usr/bin/awk '{print $1}')
+  printf '%s\t%s\t%s\n' "$material" "$bytes" "$digest" >> "$work/packages.tsv"
+done
+# Only candidate bytes: no accepted-producer receipt exists in this program.
+printf 'schema\tcrystal-package-candidate-v1\nproducer\tNOT_VERIFIED\ninstall\tNOT_RUN\nlaunch\tNOT_RUN\nreplacement\tNOT_RUN\nvisual\tNOT_RUN\nphysical\tNOT_RUN\noriginal_key_recovery\tUNKNOWN\n' > "$work/acceptance.tsv"
+var apks = glob("$work/*.apk")
+var receipts = glob("$work/*.receipt.tsv")
+/usr/bin/mv @apks @receipts "$work/packages.tsv" "$work/acceptance.tsv" "$output/"
+/usr/bin/cp "$build/sizes.tsv" "$build/stages.tsv" "$build/materials.tsv" "$output/"
+/usr/bin/cp "$build/application-sources.sha256" "$output/"
+echo 'Crystal direct package candidate: PASS; authenticated delivery is NOT_VERIFIED'

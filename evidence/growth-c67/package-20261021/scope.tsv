@@ -1,0 +1,10 @@
+schema	crystal-package-preflight-v1
+package_checks	PASS
+compile_toolchain	ndk
+link_toolchain	ndk
+policy_commit	a9866eaef44f4a2f94e05da517783f136924335d
+isolated_producer	NOT_VERIFIED
+independent_math	PENDING
+catfood_delivery	PENDING
+update_compatibility	NOT_VERIFIED
+physical_c67	NOT_RUN

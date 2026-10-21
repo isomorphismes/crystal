@@ -1,0 +1,12 @@
+schema	aici-android-producer-v1
+result	PASS
+policy_commit	a9866eaef44f4a2f94e05da517783f136924335d
+packager_commit	11edd1e0d9748d7c618413ec9f5afad52049046a
+package	org.isomorphisms.crystal.bismuth
+version_code	17
+abi	arm64-v8a
+signing_lane	test
+signer_cert_sha256	de9b1d47c5a65e6d46a204b79dd9ee566b9d3c9832ba81ebc4213d3392e92ff9
+apk_sha256	578c6c809282d83a217cfba43ff79f405a69d39b047e0a35f6c4ab167860a551
+prior_apk_sha256	-
+update_identity_result	NOT_VERIFIED

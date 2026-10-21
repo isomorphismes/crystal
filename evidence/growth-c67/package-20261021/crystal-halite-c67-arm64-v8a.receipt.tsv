@@ -1,0 +1,13 @@
+schema	android-ndk-nativeactivity-apk-v1
+package	org.isomorphisms.crystal.halite
+version_code	17
+version_name	0.3-candidate-17
+launcher_label	Crystal halite
+launcher_activity_label	Crystal halite
+abi	arm64-v8a
+native_library	libcrystal.so
+native_sha256	ef234d93094698fc518e6d692cc25204b210a05f0d5251d8ce5c431885491aba
+manifest_sha256	4c907217896fd14a96232b9b05656e5aec02ecb73cd43f681694b1bcb154e398
+apk_sha256	3f85bf44731f346eba665a97c170515843b4edbb4527c00c58e57a06ee8e8f6f
+signer_cert_sha256	de9b1d47c5a65e6d46a204b79dd9ee566b9d3c9832ba81ebc4213d3392e92ff9
+source_commit	e745edd98f5b8c854fbba4c72bb0a0a699aa50b5

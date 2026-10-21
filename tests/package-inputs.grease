@@ -1,0 +1,45 @@
+#!/usr/bin/env grease
+set -eu -o pipefail
+# These are pre-signing rejection tests, not APK acceptance.
+test "$#" = 3 || { echo 'expected NATIVE_BUILD PACKAGER_ROOT NEW_OUTPUT' >&2; exit 2; }
+var build = "$1"
+var packager = "$2"
+var output = "$3"
+var grease = ENV.GREASE_BIN
+var tests = $(/usr/bin/dirname $(/usr/bin/readlink -f "$0"))
+var recipe = "$tests/../.github/scripts/package-miro.ysh"
+test ! -e "$output"
+/usr/bin/mkdir -m 700 "$output"
+printf 'case\texpected\tresult\n' > "$output/results.tsv"
+proc refuse(name, input, version, message) {
+  if /usr/bin/env -u ANDROID_KEYSTORE "$grease" "$recipe" "$input" "$output/$name" "$version" "$packager" > "$output/$name.log" 2>&1; then
+    echo "unexpected package acceptance: $name" >&2; exit 1
+  fi
+  /usr/bin/grep -Fq "$message" "$output/$name.log"
+  test ! -e "$output/$name"
+  printf '%s\trefuse without output\tPASS\n' "$name" >> "$output/results.tsv"
+}
+refuse no-signer "$build" 17 'approved signing keystore is required'
+refuse malformed-version "$build" 17x 'invalid Android versionCode'
+refuse zero-version "$build" 0 'invalid Android versionCode'
+refuse excessive-version "$build" 2100000001 'Android versionCode exceeds platform limit'
+var fixture = "$output/native-fixture"
+/usr/bin/cp -R "$build" "$fixture"
+/usr/bin/sed -i 's/^source_commit\t.*/source_commit\tunknown/' "$fixture/materials.tsv"
+refuse unknown-source "$fixture" 17 'invalid native source commit'
+/usr/bin/cp "$build/materials.tsv" "$fixture/materials.tsv"
+printf 'changed payload\n' >> "$fixture/native/halite/libcrystal.so"
+refuse changed-payload "$fixture" 17 'native payload differs from build receipt: halite'
+/usr/bin/cp "$build/native/halite/libcrystal.so" "$fixture/native/halite/libcrystal.so"
+/usr/bin/awk -F '\t' '$1=="halite"' "$build/sizes.tsv" >> "$fixture/sizes.tsv"
+refuse duplicate-receipt "$fixture" 17 'native payload differs from build receipt: halite'
+/usr/bin/cp "$build/sizes.tsv" "$fixture/sizes.tsv"
+/usr/bin/rm "$fixture/native/pyrite/libcrystal.so"
+refuse missing-pyrite "$fixture" 17 'missing native payload: pyrite'
+/usr/bin/mkdir "$output/existing"
+printf 'preserve me\n' > "$output/existing/marker"
+if /usr/bin/env -u ANDROID_KEYSTORE "$grease" "$recipe" "$build" "$output/existing" 17 "$packager" > "$output/existing.log" 2>&1; then exit 1; fi
+/usr/bin/grep -Fq 'fresh packaging attempt required' "$output/existing.log"
+/usr/bin/grep -Fxq 'preserve me' "$output/existing/marker"
+printf 'existing-output\tpreserve earlier attempt\tPASS\n' >> "$output/results.tsv"
+/usr/bin/cat "$output/results.tsv"

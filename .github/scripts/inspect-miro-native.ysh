@@ -1,0 +1,34 @@
+#!/usr/bin/env grease
+set -eu -o pipefail
+# Consumer-side native inspection only; no producer/signing/device authority.
+test "$#" = 2 || { echo 'expected NATIVE_BUILD NEW_OUTPUT' >&2; exit 2; }
+var build = "$1"
+var output = "$2"
+test ! -e "$output" || exit 1
+var reader = "$[ENV.ANDROID_NDK_ROOT]/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
+test $(/usr/bin/sha256sum "$reader" | /usr/bin/awk '{print $1}') = a8bd1b1d548f30cf582a025bf42d63ce225a861e8ad35006a722c27e0a4b3a8c
+/usr/bin/awk -F '\t' '$1=="abi"{count++;if($2!="arm64-v8a")exit 1}END{if(count!=1)exit 1}' "$build/materials.tsv"
+/usr/bin/mkdir -m 700 "$output"
+printf 'material\tclass\tmachine\tnative_activity\tdependencies\tresult\n' > "$output/results.tsv"
+for material in halite quartz bismuth pyrite; do
+  var library = "$build/native/$material/libcrystal.so"
+  var digest = $(/usr/bin/sha256sum "$library" | /usr/bin/awk '{print $1}')
+  /usr/bin/awk -F '\t' -v material="$material" -v digest="$digest" '$1==material{count++;if($2!="arm64-v8a"||$5!=digest)exit 1}END{if(count!=1)exit 1}' "$build/sizes.tsv"
+  var report = "$output/$material.elf.txt"
+  /usr/bin/env -i PATH=/usr/bin:/bin "$reader" --wide --file-header --program-headers --dynamic --dyn-syms "$library" > "$report"
+  /usr/bin/grep -Eq 'Class: +ELF64$' "$report"
+  /usr/bin/grep -Eq 'Type: +DYN ' "$report"
+  /usr/bin/grep -Eq 'Machine: +AArch64$' "$report"
+  /usr/bin/grep -Eq '\(SONAME\).*\[libcrystal.so\]' "$report"
+  /usr/bin/awk '$NF=="ANativeActivity_onCreate"&&$(NF-1)!="UND"{found++}END{if(found!=1)exit 1}' "$report"
+  /usr/bin/awk '$1=="GNU_STACK"{found++;if($7!="RW")exit 1}END{if(found!=1)exit 1}' "$report"
+  if /usr/bin/grep -Eq '\((TEXTREL|RPATH|RUNPATH)\)' "$report"; then
+    echo "unsupported dynamic tag: $material" >&2; exit 1
+  fi
+  # The NativeActivity payload requires only Android platform libraries.
+  /usr/bin/awk '/\(NEEDED\)/{split($0,a,"\\[");split(a[2],b,"\\]");name=b[1];if(name!~/^lib(android|log|EGL|GLESv2|OpenSLES|dl|m|c)\.so$/)exit 1;seen[name]++}END{if(!seen["libandroid.so"]||!seen["libEGL.so"]||!seen["libGLESv2.so"]||!seen["libc.so"])exit 1}' "$report"
+  printf '%s\tELF64\tAArch64\tEXPORTED\tAndroid-platform-only\tPASS\n' "$material" >> "$output/results.tsv"
+done
+/usr/bin/sha256sum "$reader" > "$output/reader.sha256"
+/usr/bin/cat "$output/results.tsv"
+echo 'Native inspection only: APK, signing, installation and displayed geometry are NOT_VERIFIED'
