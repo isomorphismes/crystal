@@ -3,10 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <string.h>
 
 #include "raylib.h"
 #include "raymath.h"
@@ -394,11 +392,18 @@ int main(void) {
 
         BeginMode3D(camera);
         if (showGrid) DrawGrid(12, 0.5f);
-        if (renderMode != 1 && !growth_error) {
+        /* Occluded edges need the surface in the depth buffer even when its
+         * pigment is hidden. Otherwise NET mode accidentally becomes x-ray. */
+        if ((renderMode != 1 || !xrayEdges) && !growth_error) {
+            bool depth_only=renderMode==1;
+            rlDrawRenderBatchActive();
+            if(depth_only) rlColorMask(false,false,false,false);
             rlDisableBackfaceCulling();
             /* The shader owns pigment and normal lighting; avoid double tinting. */
             DrawModel(model, Vector3Zero(), 1.0f, WHITE);
+            rlDrawRenderBatchActive();
             rlEnableBackfaceCulling();
+            if(depth_only) rlColorMask(true,true,true,true);
         }
         if (renderMode != 0 && !growth_error) {
             // Flush before changing state: deferred triangles/lines otherwise
@@ -423,8 +428,8 @@ int main(void) {
         DrawText(TextFormat("touch %d ids %d/%d span %.1f zoom %.3f %s",
                  touchCount, zoom.first, zoom.second, zoom.span, zoom.applied,
                  frozen ? "FROZEN" : "SPIN"), 20, 110, 16, LIGHTGRAY);
-        DrawText(TextFormat("geometry OK: %d nodes %d facets %d triangles %d edges",
-                 net.net.node_count, net.net.facet_count, mesh.triangleCount, edge_count), 20, 132, 14, LIGHTGRAY);
+        DrawText(TextFormat("geometry %s: %d nodes %d facets %d triangles %d edges",
+                 growth_error?"REJECTED":"OK",net.net.node_count, net.net.facet_count, mesh.triangleCount, edge_count), 20, 132, 14, growth_error?RED:LIGHTGRAY);
         DrawText(TextFormat("%s / %s", glVendor, glRenderer), 20, 152, 12, LIGHTGRAY);
         DrawText(TextFormat("growth %s  step %llu  t %.2f  volume %.3f",
                  growth_error?"REJECTED":growth.paused?"PAUSED":"RUNNING",(unsigned long long)growth.steps,growth.time,growth_metrics.volume),20,174,16,growth_error?RED:LIME);
@@ -461,18 +466,22 @@ int main(void) {
         frame++;
         if (touchCount != lastTouch || renderMode != lastMode ||
             fabsf(zoom.distance-lastDistance)>0.001f || frame%60==0) {
-            char snapshot[1800];
+            char snapshot[4096];
             snprintf(snapshot, sizeof(snapshot),
                 "{\"schema\":\"crystal-state-v1\",\"source_commit\":\"%s\",\"package\":\"%s\","
                 "\"session\":\"%s\",\"replay_id\":\"frame-%lu\",\"screen_width\":\"%d\",\"screen_height\":\"%d\",\"gl_vendor\":\"%s\","
                 "\"gl_renderer\":\"%s\",\"gl_version\":\"%s\",\"render_path\":\"gles2-explicit-lines\","
-                "\"geometry_result\":\"PASS\",\"camera_distance\":\"%.5f\",\"camera_min\":\"%.3f\","
+                "\"geometry_result\":\"%s\",\"growth_steps\":\"%llu\",\"growth_time\":\"%.17g\","
+                "\"growth_volume\":\"%.17g\",\"growth_paused\":\"%d\","
+                "\"camera_distance\":\"%.5f\",\"camera_min\":\"%.3f\","
                 "\"camera_max\":\"%.3f\",\"clip_near\":\"%.3f\",\"clip_far\":\"%.3f\","
                 "\"touch_count\":\"%d\",\"pointer_ids\":\"%d,%d\",\"pinch_span\":\"%.5f\","
                 "\"applied_zoom\":\"%.5f\",\"requested_distance\":\"%.5f\",\"yaw\":\"%.5f\","
                 "\"pitch\":\"%.5f\",\"frozen\":\"%d\",\"render_mode\":\"%d\",\"xray\":\"%d\"}",
                 CRYSTAL_SOURCE_COMMIT, CRYSTAL_PACKAGE_ID, launchSession, frame, sw, sh,
-                safeVendor, safeRenderer, safeVersion, zoom.distance, zoom.minimum, zoom.maximum,
+                safeVendor, safeRenderer, safeVersion, growth_error?"FAIL":"PASS",
+                (unsigned long long)growth.steps,growth.time,growth_metrics.volume,growth.paused,
+                zoom.distance, zoom.minimum, zoom.maximum,
                 (double)RL_CULL_DISTANCE_NEAR, clip_far, touchCount,
                 observedPointer0, observedPointer1, zoom.span, zoom.applied, zoom.requested, yaw, pitch,
                 frozen, renderMode, xrayEdges);
