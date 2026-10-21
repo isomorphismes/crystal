@@ -1,0 +1,5 @@
+material	class	machine	native_activity	dependencies	result
+halite	ELF64	AArch64	EXPORTED	Android-platform-only	PASS
+quartz	ELF64	AArch64	EXPORTED	Android-platform-only	PASS
+bismuth	ELF64	AArch64	EXPORTED	Android-platform-only	PASS
+pyrite	ELF64	AArch64	EXPORTED	Android-platform-only	PASS

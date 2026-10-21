@@ -84,8 +84,9 @@ No lifecycle callback or displayed frame has been exercised on a physical C67.
 The native recipe now declares ARM64 and all four material variants. The package
 recipe derives ABI from its native receipt, uses the canonical Android-NDK
 packager and produces the requested individual C67 filenames. Existing package
-IDs and signer selection rules remain intact. These recipes are source
-candidates, not evidence of a completed native link or signed APK.
+IDs and signer selection rules remain intact. All four ARM64 native variants
+have now linked at commit `e745edd98f5b8c854fbba4c72bb0a0a699aa50b5`.
+These are native candidates; no signed APK has been produced.
 
 ## Executed qualification and remaining obligations
 
@@ -103,8 +104,32 @@ covariance, quartz mirror equivalence, family-weight competition, Halite cube
 dominance and retained bismuth terrace state. Three compiled implementation
 mutants erase speeds, handedness or diploidal distinction; each fails its named
 independent expectation. The render adapter’s cube has 48 segments along its
-12 boundaries, rather than 288 visible sampling edges. Four ARM64 application
-variants pass NDK syntax checks; that is not an Android link or execution.
+12 boundaries, rather than 288 visible sampling edges. The host suite passed
+again on October 21. The growth and rendering-adapter translation units are
+unchanged from that run; application diagnostics subsequently received a larger
+snapshot buffer and an additional ARM64 format check.
+
+`evidence/growth-c67/native-20261021/` records a clean, exact-commit ARM64
+compile/link/strip of all four variants through Flexible Pipes. Each stripped
+library is 1,178,352 bytes. The retained AI-CI verifier source at
+`5c80279dfcee565f4e999d2b1f97feb966b8efd3` reproduced its required executable
+hash before the unchanged native recipe ran. Its own contract/signing cases
+passed; this reproduces a candidate verifier and does not independently accept
+Crystal's mathematics or authorize the shared producer.
+
+Consumer ELF inspection checks the recorded library hashes, ELF64/AArch64,
+exported NativeActivity entry point, non-executable stack, Android platform-only
+dependencies, and absence of TEXTREL/RPATH/RUNPATH. This does not exercise GLES
+or the Android lifecycle. The native build retains an upstream Lua `tmpnam`
+deprecation warning. Native hashes and source hashes are in the evidence
+directory; they are not APK hashes.
+
+Wireframe-only occlusion now submits a surface depth pass with color writes
+disabled. Previously that mode had no surface depth and could show rear edges
+despite selecting occlusion. Device diagnostics now report actual growth time,
+step count, volume and pause status, and report rejected geometry as failure.
+Neither this depth-pass repair nor shader appearance has displayed-device
+acceptance.
 
 Independent AI-CI mathematical/producer acceptance is PENDING. The approved FP
 Android registry currently lists only Wegert, and its producer requires an ICK
@@ -114,6 +139,13 @@ existing Crystal test identities; Pyrite has no entry. Installed C67 package
 and certificate compatibility has not been observed. The earlier original-key
 recovery obligation remains unresolved. No APK was signed, delivered, installed
 or physically accepted, and no PR is eligible for merge on this host evidence.
+The exact-commit GitHub run on October 21 failed before compilation with
+`BLOCKED: registered Android operation is not deployed`:
+https://github.com/isomorphismes/crystal/actions/runs/39597755932/job/119214209536.
+The retained registered-operation work also requires qualified predecessor
+decisions; the local native pipeline grants none of that authority. The
+maintained Kitchen/producer route, approved signer provision and installed C67
+update identity remain completion obligations.
 
 Owners remain Crystal issues 2, 8 and 9. External sources in the separate
 geometry-source PR were reviewed as references; none was imported into this

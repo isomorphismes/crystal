@@ -1,0 +1,10 @@
+447cd98b573a4407f34260aa728cc552451374f58149bbbba6b8f04916a4fcdb  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal.c
+bf2c2bbe16cdcede3b6e49b11bf2c1cf6deae840ea9d931e4ac6c86bd12aea3e  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_model.c
+62daefeba474158eef29405ecda534ec140dcc32f025d76f7fb852e2ca0c9c95  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_model.h
+65eef8b3e9923a2c1255d2d26673f157c3258ff3b97572fd30e22590bf865f69  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_render.c
+7fccd162a016e4f22de2b0757338def2e8eee2f0e04033d4903e7da84e7f0374  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_render.h
+07eb091fffc25a38d10558776206e64a9e0cd29dd98f4cbad00c1eccaae901fe  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/diagnostic_state.h
+4fcf61df659eed8822e382fdf08b2407c5ffdb07adc9c8a4bf1075064565551a  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_growth.c
+a0bbcde0a6504fcde42ef8aebf80fb2110fcf05f18d40e688f22615c6619152e  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_growth.h
+70989104576a4ccb7f8b95a46bdcc0558589cbe00b8556d46a726e82631e448a  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_growth_surface.c
+448f339aaa0052ebd7c505ccb2d2d6b6787705e48e653e69a9db526f2abbea31  /workspace/scratch/7d64eaed802d/crystal/app/src/main/cpp/crystal_growth_surface.h
